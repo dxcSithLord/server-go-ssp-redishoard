@@ -81,8 +81,9 @@ issues:
         - funlen
         - gocognit
 
-    # Exclude known linters from partially hard-vendored code
-    - path: secure\.go
+    # Exclude unsafe usage warnings from platform-specific security code
+    # These use unsafe.Pointer intentionally for memory locking syscalls
+    - path: secure.*\.go
       text: "G103: Use of unsafe calls should be audited"
 
     # Exclude lll issues for long lines with go:generate

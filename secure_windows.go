@@ -15,6 +15,7 @@ func LockMemory(b []byte) error {
 	if len(b) == 0 {
 		return nil
 	}
+	//nolint:gosec // G103: unsafe.Pointer required for Windows syscall - intentional for security feature
 	return windows.VirtualLock(uintptr(unsafe.Pointer(&b[0])), uintptr(len(b)))
 }
 
@@ -23,5 +24,6 @@ func UnlockMemory(b []byte) error {
 	if len(b) == 0 {
 		return nil
 	}
+	//nolint:gosec // G103: unsafe.Pointer required for Windows syscall - intentional for security feature
 	return windows.VirtualUnlock(uintptr(unsafe.Pointer(&b[0])), uintptr(len(b)))
 }
