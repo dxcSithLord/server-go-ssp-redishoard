@@ -27,7 +27,9 @@ go get github.com/sqrldev/server-go-ssp-redishoard
 
 - Go 1.23 or later
 - Redis 7.2 or later
-- [github.com/sqrldev/server-go-ssp](https://github.com/sqrldev/server-go-ssp)
+- [github.com/sqrldev/server-go-ssp](https://github.com/sqrldev/server-go-ssp) (currently using [dxcSithLord fork](https://github.com/dxcSithLord/server-go-ssp) via replace directive)
+
+> **Note**: This package currently uses the dxcSithLord fork of server-go-ssp for development. The fork will be merged back to sqrldev when ready. See `go.mod` replace directive for details.
 
 ## Quick Start
 

@@ -13,9 +13,11 @@
 | Dependency | New Import Path | Target Version | Release Date | Notes |
 |------------|-----------------|----------------|--------------|-------|
 | go-redis | `github.com/redis/go-redis/v9` | **v9.16.0** | Oct 23, 2025 | Latest stable |
-| server-go-ssp | `github.com/sqrldev/server-go-ssp` | **v0.0.0-20241212182118** | Dec 12, 2024 | Latest commit |
-| golang.org/x/sys | `golang.org/x/sys` | **v0.27.0** | Nov 2025 | Platform APIs |
+| server-go-ssp | `github.com/sqrldev/server-go-ssp` | **v0.0.0-20241212182118** | Dec 12, 2024 | Uses dxcSithLord fork via replace |
+| golang.org/x/sys | `golang.org/x/sys` | **v0.28.0** | Nov 2025 | Platform APIs |
 | Go | N/A | **1.23.x** | 2024 | Current stable |
+
+> **Development Note**: Currently using `github.com/dxcSithLord/server-go-ssp` fork via go.mod replace directive. This allows development work to proceed while maintaining import path compatibility. The fork will be merged back to sqrldev/server-go-ssp when ready.
 
 ---
 

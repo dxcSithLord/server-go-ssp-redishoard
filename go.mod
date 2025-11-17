@@ -15,3 +15,6 @@ require (
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 )
+
+// Use dxcSithLord fork for development - will be merged back to sqrldev
+replace github.com/sqrldev/server-go-ssp => github.com/dxcSithLord/server-go-ssp v0.0.0-20241212182118-c8230b16b87d
