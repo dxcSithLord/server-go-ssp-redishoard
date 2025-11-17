@@ -17,7 +17,6 @@ linters:
     - dupl
     - errorlint
     - exhaustive
-    - exportloopref
     - funlen
     - gocognit
     - goconst
@@ -42,9 +41,8 @@ linters:
 
 linters-settings:
   govet:
-    check-shadowing: true
-  golint:
-    min-confidence: 0
+    enable:
+      - shadow
   gocyclo:
     min-complexity: 15
   dupl:
@@ -68,6 +66,8 @@ linters-settings:
     config:
       G401:
         min-entropy: 32.0
+  revive:
+    confidence: 0.8
 
 issues:
   exclude-rules:
