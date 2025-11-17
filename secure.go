@@ -2,9 +2,7 @@ package redishoard
 
 import (
 	"crypto/subtle"
-	"reflect"
 	"runtime"
-	"unsafe"
 )
 
 // ClearBytes securely clears a byte slice from memory.
@@ -26,33 +24,6 @@ func ClearBytes(b []byte) {
 
 	// Additional memory barrier to prevent reordering
 	_ = subtle.ConstantTimeCompare(b, b)
-}
-
-// ClearString securely clears a string's underlying bytes.
-// WARNING: This modifies immutable string memory - use with extreme caution.
-// Only use on strings that contain sensitive data and are about to be discarded.
-func ClearString(s *string) {
-	if s == nil || len(*s) == 0 {
-		return
-	}
-
-	// Get the underlying byte slice of the string
-	// This is unsafe but necessary for security
-	stringHeader := (*reflect.StringHeader)(unsafe.Pointer(s))
-	if stringHeader.Data == 0 {
-		return
-	}
-
-	// Create a byte slice pointing to string data
-	b := unsafe.Slice((*byte)(unsafe.Pointer(stringHeader.Data)), stringHeader.Len)
-
-	// Clear the bytes
-	ClearBytes(b)
-
-	// Reset the string
-	*s = ""
-
-	runtime.KeepAlive(s)
 }
 
 // SecureBuffer wraps a byte slice with automatic secure clearing.

@@ -145,9 +145,6 @@ func (h *Hoard) Save(nut ssp.Nut, value *ssp.HoardCache, expiration time.Duratio
 // ClearBytes securely zeros a byte slice
 func ClearBytes(b []byte)
 
-// ClearString securely clears a string
-func ClearString(s *string)
-
 // ValidateNut validates nut format
 func ValidateNut(nut string) error
 

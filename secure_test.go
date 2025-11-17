@@ -51,38 +51,6 @@ func TestClearBytes(t *testing.T) {
 	}
 }
 
-func TestClearString(t *testing.T) {
-	t.Run("clear password string", func(t *testing.T) {
-		secret := "my-secret-password"
-		originalLen := len(secret)
-
-		ClearString(&secret)
-
-		// String should be empty after clearing
-		if secret != "" {
-			t.Errorf("string not cleared: got %q, want empty string", secret)
-		}
-
-		// Original length should be tracked for verification
-		if originalLen == 0 {
-			t.Error("original string was unexpectedly empty")
-		}
-	})
-
-	t.Run("clear empty string", func(t *testing.T) {
-		empty := ""
-		ClearString(&empty)
-		if empty != "" {
-			t.Errorf("empty string modified: got %q", empty)
-		}
-	})
-
-	t.Run("clear nil pointer", func(t *testing.T) {
-		// Should not panic
-		ClearString(nil)
-	})
-}
-
 func TestSecureBuffer(t *testing.T) {
 	t.Run("create and destroy buffer", func(t *testing.T) {
 		buf, err := NewSecureBuffer(32, false)
