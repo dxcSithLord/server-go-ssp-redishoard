@@ -2,6 +2,7 @@ package redishoard
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 )
 
@@ -185,7 +186,11 @@ func TestValidateNut(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := ValidateNut(tt.nut)
-			if err != tt.expectError {
+			if tt.expectError == nil {
+				if err != nil {
+					t.Errorf("ValidateNut(%q) = %v, want nil", tt.nut, err)
+				}
+			} else if !errors.Is(err, tt.expectError) {
 				t.Errorf("ValidateNut(%q) = %v, want %v", tt.nut, err, tt.expectError)
 			}
 		})

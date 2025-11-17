@@ -2,12 +2,15 @@ package redishoard
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 	ssp "github.com/sqrldev/server-go-ssp"
 )
+
+const testStateValue = "boom!"
 
 // Redis must be installed locally on the default port to run these tests
 func TestSave(t *testing.T) {
@@ -19,7 +22,7 @@ func TestSave(t *testing.T) {
 	// Use valid base64url safe nut
 	var nut ssp.Nut = "test-nut-save-1234"
 	hoardCache := &ssp.HoardCache{
-		State: "boom!",
+		State: testStateValue,
 	}
 	err := h.Save(nut, hoardCache, time.Second*10)
 	if err != nil {
@@ -31,7 +34,7 @@ func TestSave(t *testing.T) {
 		t.Fatalf("Failed getting from Hoard: %v", err)
 	}
 
-	if val.State != "boom!" {
+	if val.State != testStateValue {
 		t.Fatalf("Wrong value from Hoard: %#v", val)
 	}
 
@@ -48,7 +51,7 @@ func TestGetAndDelete(t *testing.T) {
 	// Use valid base64url safe nut
 	var nut ssp.Nut = "test-get-and-delete"
 	hoardCache := &ssp.HoardCache{
-		State: "boom!",
+		State: testStateValue,
 	}
 	err := h.Save(nut, hoardCache, time.Second*10)
 	if err != nil {
@@ -60,7 +63,7 @@ func TestGetAndDelete(t *testing.T) {
 		t.Fatalf("Failed Get from Hoard: %v", err)
 	}
 
-	if val.State != "boom!" {
+	if val.State != testStateValue {
 		t.Fatalf("Wrong value from Hoard: %#v", val)
 	}
 
@@ -69,12 +72,12 @@ func TestGetAndDelete(t *testing.T) {
 		t.Fatalf("Failed GetAndDelete from Hoard: %v", err)
 	}
 
-	if val.State != "boom!" {
+	if val.State != testStateValue {
 		t.Fatalf("Wrong value from Hoard: %#v", val)
 	}
 
 	val, err = h.GetAndDelete(nut)
-	if err != ssp.ErrNotFound {
+	if !errors.Is(err, ssp.ErrNotFound) {
 		t.Fatalf("Should have been deleted but wasn't: %v", err)
 	}
 
@@ -147,7 +150,7 @@ func TestGetNonExistentNut(t *testing.T) {
 	var nut ssp.Nut = "nonexistent-nut-xyz"
 
 	_, err := h.Get(nut)
-	if err != ssp.ErrNotFound {
+	if !errors.Is(err, ssp.ErrNotFound) {
 		t.Fatalf("Expected ErrNotFound, got: %v", err)
 	}
 }

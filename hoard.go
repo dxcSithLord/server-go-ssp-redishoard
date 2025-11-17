@@ -3,6 +3,7 @@ package redishoard
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -34,7 +35,7 @@ func (h *Hoard) Get(nut ssp.Nut) (*ssp.HoardCache, error) {
 	ctx := context.Background()
 	data, err := h.client.Get(ctx, string(nut)).Bytes()
 	if err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return nil, ssp.ErrNotFound
 		}
 		return nil, fmt.Errorf("redis nut lookup failed: %w", err)
@@ -64,10 +65,10 @@ func (h *Hoard) GetAndDelete(nut ssp.Nut) (*ssp.HoardCache, error) {
 		return nil
 	})
 
-	if err != nil && err != redis.Nil {
+	if err != nil && !errors.Is(err, redis.Nil) {
 		// Check if any command in the pipeline failed
 		for _, cmd := range ret {
-			if cmdErr := cmd.Err(); cmdErr != nil && cmdErr != redis.Nil {
+			if cmdErr := cmd.Err(); cmdErr != nil && !errors.Is(cmdErr, redis.Nil) {
 				return nil, fmt.Errorf("redis transaction failed: %w", cmdErr)
 			}
 		}
@@ -86,7 +87,7 @@ func (h *Hoard) GetAndDelete(nut ssp.Nut) (*ssp.HoardCache, error) {
 
 	// Check for not found error
 	if err := stringCmd.Err(); err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return nil, ssp.ErrNotFound
 		}
 		return nil, fmt.Errorf("redis nut lookup failed: %w", err)
