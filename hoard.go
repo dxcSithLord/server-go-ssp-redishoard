@@ -44,7 +44,7 @@ func (h *Hoard) Get(nut ssp.Nut) (*ssp.HoardCache, error) {
 	// SECURITY: Ensure sensitive data is cleared from memory after use
 	defer ClearBytes(data)
 
-	return h.fromBytes(nut, data)
+	return h.fromBytes(data)
 }
 
 // GetAndDelete implements ssp.Hoard with atomic operations and secure memory handling.
@@ -86,11 +86,11 @@ func (h *Hoard) GetAndDelete(nut ssp.Nut) (*ssp.HoardCache, error) {
 	}
 
 	// Check for not found error
-	if err := stringCmd.Err(); err != nil {
-		if errors.Is(err, redis.Nil) {
+	if cmdErr := stringCmd.Err(); cmdErr != nil {
+		if errors.Is(cmdErr, redis.Nil) {
 			return nil, ssp.ErrNotFound
 		}
-		return nil, fmt.Errorf("redis nut lookup failed: %w", err)
+		return nil, fmt.Errorf("redis nut lookup failed: %w", cmdErr)
 	}
 
 	data, err := stringCmd.Bytes()
@@ -104,12 +104,12 @@ func (h *Hoard) GetAndDelete(nut ssp.Nut) (*ssp.HoardCache, error) {
 	// NOTE: Removed sensitive data logging (CWE-200 fix)
 	// Previously: log.Printf("data: %v", string(data))
 
-	return h.fromBytes(nut, data)
+	return h.fromBytes(data)
 }
 
 // fromBytes deserializes JSON data into a HoardCache object.
 // Internal helper function with secure memory considerations.
-func (h *Hoard) fromBytes(nut ssp.Nut, data []byte) (*ssp.HoardCache, error) {
+func (h *Hoard) fromBytes(data []byte) (*ssp.HoardCache, error) {
 	hoardCache := &ssp.HoardCache{}
 	err := json.Unmarshal(data, hoardCache)
 	if err != nil {

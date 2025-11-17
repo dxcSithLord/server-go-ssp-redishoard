@@ -12,7 +12,7 @@ import (
 
 const testStateValue = "boom!"
 
-// Redis must be installed locally on the default port to run these tests
+// Redis must be installed locally on the default port to run these tests.
 func TestSave(t *testing.T) {
 	client := redis.NewUniversalClient(&redis.UniversalOptions{})
 	defer client.Close()

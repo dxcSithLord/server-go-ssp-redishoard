@@ -115,8 +115,8 @@ func isBase64URLSafe(c rune) bool {
 		c == '-' || c == '_'
 }
 
-// Constants for nut validation
+// Constants for nut validation.
 const (
-	MinNutLength = 8  // Minimum nut length in characters
-	MaxNutLength = 64 // Maximum nut length in characters (base64 encoded)
+	MinNutLength = 8  // Minimum nut length in characters.
+	MaxNutLength = 64 // Maximum nut length in characters (base64 encoded).
 )

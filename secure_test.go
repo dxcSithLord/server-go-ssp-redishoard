@@ -214,7 +214,7 @@ func TestIsBase64URLSafe(t *testing.T) {
 	}
 }
 
-// BenchmarkClearBytes measures performance of secure clearing
+// BenchmarkClearBytes measures performance of secure clearing.
 func BenchmarkClearBytes(b *testing.B) {
 	sizes := []int{16, 64, 256, 1024, 4096}
 
@@ -231,7 +231,7 @@ func BenchmarkClearBytes(b *testing.B) {
 	}
 }
 
-// BenchmarkValidateNut measures validation performance
+// BenchmarkValidateNut measures validation performance.
 func BenchmarkValidateNut(b *testing.B) {
 	nut := "test-nut-value-1234567890"
 	b.ReportAllocs()
