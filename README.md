@@ -1,6 +1,6 @@
 # SQRL Redis Hoard
 
-[![CI/CD Pipeline](https://github.com/sqrldev/server-go-ssp-redishoard/actions/workflows/ci.yml/badge.svg)](https://github.com/sqrldev/server-go-ssp-redishoard/actions/workflows/ci.yml)
+[![CI/CD Pipeline](https://github.com/dxcSithLord/server-go-ssp-redishoard/actions/workflows/ci.yml/badge.svg)](https://github.com/dxcSithLord/server-go-ssp-redishoard/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sqrldev/server-go-ssp-redishoard)](https://goreportcard.com/report/github.com/sqrldev/server-go-ssp-redishoard)
 [![GoDoc](https://godoc.org/github.com/sqrldev/server-go-ssp-redishoard?status.svg)](https://godoc.org/github.com/sqrldev/server-go-ssp-redishoard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -27,9 +27,9 @@ go get github.com/sqrldev/server-go-ssp-redishoard
 
 - Go 1.23 or later
 - Redis 7.2 or later
-- [github.com/sqrldev/server-go-ssp](https://github.com/sqrldev/server-go-ssp) (currently using [dxcSithLord fork](https://github.com/dxcSithLord/server-go-ssp) via replace directive)
+- [github.com/sqrldev/server-go-ssp](https://github.com/dxcSithLord/server-go-ssp) (actively developed at [dxcSithLord](https://github.com/dxcSithLord/server-go-ssp))
 
-> **Note**: This package currently uses the dxcSithLord fork of server-go-ssp for development. The fork will be merged back to sqrldev when ready. See `go.mod` replace directive for details.
+> **Note**: This package is actively developed under the dxcSithLord organization. Import paths retain the `sqrldev` namespace for compatibility, while development occurs in the dxcSithLord repositories. See `go.mod` replace directive for details.
 
 ## Quick Start
 
@@ -247,7 +247,7 @@ client := redis.NewUniversalClient(&redis.UniversalOptions{
 - [Requirements](REQUIREMENTS.md)
 - [Security Plan](SECURITY_PLAN.md)
 - [Upgrade Path](UPGRADE_PATH.md)
-- [SQRL SSP API](https://github.com/sqrldev/server-go-ssp)
+- [SQRL SSP API](https://github.com/dxcSithLord/server-go-ssp)
 
 ## License
 
@@ -255,6 +255,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Related Projects
 
-- [server-go-ssp](https://github.com/sqrldev/server-go-ssp) - SQRL Server Side Protocol
-- [server-go-ssp-gormauthstore](https://github.com/sqrldev/server-go-ssp-gormauthstore) - GORM AuthStore
+- [server-go-ssp](https://github.com/dxcSithLord/server-go-ssp) - SQRL Server Side Protocol
+- [server-go-ssp-gormauthstore](https://github.com/dxcSithLord/server-go-ssp-gormauthstore) - GORM AuthStore
 - [SQRL Specification](https://www.grc.com/sqrl/sqrl.htm) - GRC SQRL Documentation
