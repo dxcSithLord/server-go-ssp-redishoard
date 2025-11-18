@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+        cache: true
+
+    - name: Run tests before release
+      run: go test -v ./...
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Get previous tag
+        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+        if [ -z "$PREV_TAG" ]; then
+          echo "No previous tag found, using all commits"
+          COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+        else
+          echo "Previous tag: $PREV_TAG"
+          COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+        fi
+
+        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+        echo "## What's Changed" >> $GITHUB_OUTPUT
+        echo "$COMMITS" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "## Security" >> $GITHUB_OUTPUT
+        echo "- Secure memory clearing for sensitive data (CWE-226)" >> $GITHUB_OUTPUT
+        echo "- No sensitive data in logs (CWE-200)" >> $GITHUB_OUTPUT
+        echo "- Input validation for cryptographic nonces" >> $GITHUB_OUTPUT
+        echo "- Platform-aware memory locking" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "## Dependencies" >> $GITHUB_OUTPUT
+        echo "- go-redis/v9: v9.16.0" >> $GITHUB_OUTPUT
+        echo "- server-go-ssp: v0.0.0-20241212182118" >> $GITHUB_OUTPUT
+        echo "- golang.org/x/sys: v0.27.0" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        body: ${{ steps.changelog.outputs.CHANGELOG }}
+        draft: false
+        prerelease: false
+        generate_release_notes: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

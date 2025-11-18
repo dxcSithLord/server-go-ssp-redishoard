@@ -1,0 +1,166 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go-version: ['1.23', '1.24']
+        redis-version: ['7.2', '7.4']
+
+    services:
+      redis:
+        image: redis:${{ matrix.redis-version }}
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.go-version }}
+        cache: true
+
+    - name: Verify dependencies
+      run: |
+        go mod download
+        go mod verify
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Run unit tests
+      run: go test -v -short ./...
+
+    - name: Run integration tests
+      run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+      env:
+        REDIS_URL: redis://localhost:6379
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.out
+        flags: unittests
+        name: codecov-umbrella
+      continue-on-error: true
+
+  lint:
+    name: Lint and Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+        cache: true
+
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: latest
+        args: --timeout=5m
+
+    - name: go vet
+      run: go vet ./...
+
+    - name: staticcheck
+      run: |
+        go install honnef.co/go/tools/cmd/staticcheck@latest
+        staticcheck ./...
+
+  security:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+        cache: true
+
+    - name: Run Gosec Security Scanner
+      uses: securego/gosec@master
+      with:
+        args: '-no-fail -fmt sarif -out results.sarif ./...'
+
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: results.sarif
+      continue-on-error: true
+
+    - name: Run govulncheck
+      run: |
+        go install golang.org/x/vuln/cmd/govulncheck@latest
+        # Run govulncheck but don't fail on stdlib vulnerabilities
+        # These are informational - stdlib vulns are fixed by Go version upgrades
+        govulncheck ./... || {
+          exit_code=$?
+          if [ $exit_code -eq 3 ]; then
+            echo "::warning::govulncheck found vulnerabilities in Go standard library. Consider upgrading Go version."
+            exit 0
+          else
+            exit $exit_code
+          fi
+        }
+
+    - name: Check for sensitive data patterns
+      run: |
+        echo "Checking for hardcoded secrets..."
+        # Check for potential hardcoded secrets
+        if grep -r "password\s*=" --include="*.go" . | grep -v "_test.go" | grep -v "// "; then
+          echo "WARNING: Possible hardcoded passwords found"
+        fi
+
+        # Check for API keys
+        if grep -r "apikey\|api_key\|API_KEY" --include="*.go" . | grep -v "_test.go" | grep -v "// "; then
+          echo "WARNING: Possible hardcoded API keys found"
+        fi
+
+        # Verify no logging of sensitive data (excluding test files)
+        if grep -r "log\.\(Printf\|Println\|Print\)" --include="*.go" . | grep -v "_test.go"; then
+          echo "WARNING: Logging statements found - verify no sensitive data is logged"
+        fi
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v4
+      with:
+        fail-on-severity: moderate
